@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080d18">
+<title>NEXT LEVEL BARBER | Reservas</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#080d18;color:white;padding:25px 15px;min-height:100vh}
+.contenedor{max-width:470px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+.logo{font-size:24px;font-weight:bold;color:#42adff;letter-spacing:1px}
+.logo small{display:block;font-size:10px;color:white;letter-spacing:3px;margin-top:5px}
+.estado{background:#17283e;color:#58b8ff;padding:9px;border-radius:20px;font-size:11px}
+.tarjeta{background:#141b27;border:1px solid #29394c;border-radius:20px;padding:23px 18px;box-shadow:0 15px 40px #0008}
+.intro{text-align:center;margin-bottom:25px}
+.intro h1{font-size:27px;margin-bottom:8px}
+.intro span{color:#42adff}
+.intro p{color:#a8b4c4;font-size:12px}
+.pasos{display:flex;justify-content:space-between;margin-bottom:20px}
+.paso{flex:1;text-align:center;font-size:10px;color:#8492a5}
+.numero{width:26px;height:26px;border-radius:50%;background:#29394c;display:flex;align-items:center;justify-content:center;margin:0 auto 7px}
+.paso.activo .numero,.paso.completo .numero{background:#42adff;color:#08111d}
+.paso.activo{color:white}
+.progreso{height:3px;background:#29394c;margin-bottom:25px}
+.progreso div{height:100%;background:#42adff;width:25%;transition:.3s}
+h2{font-size:18px;margin-bottom:17px}
+.pantalla{display:none}
+.pantalla.activa{display:block}
+.servicio{background:#1c2735;border:1px solid #354459;border-radius:9px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:10px}
+.servicio.seleccionado{border-color:#42adff;background:#203c59}
+.servicio h3{font-size:13px;margin-bottom:5px}
+.servicio p{font-size:10px;color:#a9b8c9}
+.servicio strong{color:#69bdff;font-size:14px;white-space:nowrap}
+.servicio input,.adicional input{accent-color:#42adff;width:18px;height:18px;flex-shrink:0}
+.subtitulo{margin-top:25px;color:#55b7ff;font-size:14px;margin-bottom:12px}
+.adicional{background:#1c2735;border:1px solid #354459;border-radius:9px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer}
+.adicional strong{color:#69bdff;white-space:nowrap}
+.adicional span{font-size:12px}
+.total{display:flex;justify-content:space-between;align-items:center;background:#102a42;border:1px solid #42adff;padding:16px;border-radius:10px;margin-top:17px}
+.total strong{color:#70c4ff;font-size:23px}
+.profesional{background:#1c2735;border:1px solid #354459;border-radius:10px;padding:18px;display:flex;align-items:center;gap:12px;margin-bottom:12px;cursor:pointer}
+.profesional.seleccionado{border-color:#42adff;background:#203c59}
+.avatar{background:#183c5d;color:#65baff;width:45px;height:45px;border-radius:50%;display:grid;place-items:center;font-size:22px;flex-shrink:0}
+.profesional p{color:#a9b8c9;font-size:11px;margin-top:5px}
+.profesional input{margin-left:auto;accent-color:#42adff}
+label{display:block;font-size:12px;margin:15px 0 8px}
+input[type="text"],input[type="tel"],input[type="date"]{display:block;width:100%;min-height:48px;background:#1c2735;border:1px solid #354459;padding:13px;border-radius:8px;color:white;outline:none;font-size:16px;position:relative;z-index:2;pointer-events:auto;user-select:text;-webkit-user-select:text;touch-action:manipulation}
+input:focus{border-color:#42adff;box-shadow:0 0 0 2px #42adff22}
+.horarios{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:15px}
+.horario{padding:12px 5px;background:#1c2735;color:white;border:1px solid #354459;border-radius:7px;cursor:pointer}
+.horario.seleccionado{background:#42adff;color:#08111d;border-color:#42adff}
+.horario:disabled{opacity:.3;cursor:not-allowed;text-decoration:line-through}
+.botones{display:flex;gap:10px;margin-top:25px}
+.boton{flex:1;background:#42adff;color:#071321;border:none;padding:14px;border-radius:8px;font-weight:bold;cursor:pointer;min-height:46px}
+.boton:hover{background:#80caff}
+.atras{background:#303d4e;color:white}
+.resumen{background:#1c2735;padding:15px;border-radius:10px;line-height:2;font-size:13px;margin-top:20px;overflow-wrap:anywhere}
+.resumen strong{color:#69bdff}
+.confirmacion{text-align:center;padding:50px 5px}
+.check{background:#42adff;color:#071321;width:75px;height:75px;border-radius:50%;margin:auto auto 20px;display:grid;place-items:center;font-size:40px}
+.confirmacion p{color:#b9c6d5;line-height:1.9;font-size:13px}
+.aviso{color:#a9b8c9;font-size:11px;line-height:1.6;margin-top:14px;text-align:center}
+footer{text-align:center;color:#8b9aad;font-size:11px;margin-top:22px;line-height:1.8}
+@media(max-width:380px){.tarjeta{padding:18px 12px}.intro h1{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="contenedor">
+<header>
+  <div class="logo">NEXT LEVEL<small>BARBER</small></div>
+  <div class="estado">✦ RESERVAS</div>
+</header>
+
+<div class="tarjeta">
+  <div class="intro">
+    <h1>SUBE DE <span>NIVEL.</span></h1>
+    <p>Reserva tu próximo estilo con nosotros.</p>
+  </div>
+
+  <div class="pasos">
+    <div class="paso activo"><div class="numero">1</div>Servicio</div>
+    <div class="paso"><div class="numero">2</div>Barbero</div>
+    <div class="paso"><div class="numero">3</div>Fecha</div>
+    <div class="paso"><div class="numero">4</div>Datos</div>
+  </div>
+  <div class="progreso"><div id="barra"></div></div>
+
+  <div class="pantalla activa" id="paso1">
+    <h2>Selecciona tu servicio</h2>
+    <div id="listaServicios"></div>
+    <h3 class="subtitulo">SERVICIOS ADICIONALES</h3>
+    <label class="adicional"><span>Pigmentación de cejas</span><strong>+$2.00</strong><input type="checkbox" id="pigmentacion" onchange="actualizarTotal()"></label>
+    <label class="adicional"><span>Diseño de cejas</span><strong>+$1.00</strong><input type="checkbox" id="diseno" onchange="actualizarTotal()"></label>
+    <div class="total"><span>PRECIO TOTAL</span><strong id="precioTotal">$0.00</strong></div>
+    <div class="botones"><button type="button" class="boton" onclick="siguiente(1)">CONTINUAR →</button></div>
+  </div>
+
+  <div class="pantalla" id="paso2">
+    <h2>Selecciona tu barbero</h2>
+    <div class="profesional seleccionado">
+      <div class="avatar">✂</div>
+      <div><strong>Equipo NEXT LEVEL</strong><p>Atención profesional</p></div>
+      <input type="radio" checked name="barbero" aria-label="Equipo NEXT LEVEL">
+    </div>
+    <p style="color:#a9b8c9;font-size:12px;margin-top:15px">Tu cita será atendida por el equipo de NEXT LEVEL BARBER.</p>
+    <div class="botones">
+      <button type="button" class="boton atras" onclick="anterior(2)">ATRÁS</button>
+      <button type="button" class="boton" onclick="siguiente(2)">CONTINUAR →</button>
+    </div>
+  </div>
+
+  <div class="pantalla" id="paso3">
+    <h2>Fecha y hora de tu cita</h2>
+    <label for="fecha">Selecciona el día</label>
+    <input type="date" id="fecha">
+    <p style="font-size:11px;color:#a9b8c9;margin-top:12px">Lunes a sábado · 8:00 AM a 4:00 PM</p>
+    <h3 class="subtitulo">HORARIOS DISPONIBLES</h3>
+    <div class="horarios" id="horarios"></div>
+    <div class="botones">
+      <button type="button" class="boton atras" onclick="anterior(3)">ATRÁS</button>
+      <button type="button" class="boton" onclick="siguiente(3)">CONTINUAR →</button>
+    </div>
+  </div>
+
+  <div class="pantalla" id="paso4">
+    <h2>Datos del cliente</h2>
+    <label for="nombre">Nombre completo</label>
+    <input type="text" id="nombre" placeholder="Escribe tu nombre" autocomplete="name" autocapitalize="words" inputmode="text">
+    <label for="telefono">Número de teléfono</label>
+    <input type="tel" id="telefono" placeholder="Tu número de teléfono" autocomplete="tel" inputmode="tel">
+    <div class="resumen" id="resumen"></div>
+    <div class="botones">
+      <button type="button" class="boton atras" onclick="anterior(4)">ATRÁS</button>
+      <button type="button" class="boton" id="btnReservar" onclick="confirmar()">RESERVAR ✓</button>
+    </div>
+  </div>
+
+  <div class="pantalla" id="final">
+    <div class="confirmacion">
+      <div class="check">✓</div>
+      <h2>¡SOLICITUD LISTA!</h2>
+      <p id="detalleFinal"></p>
+      <div class="botones"><button type="button" class="boton" onclick="enviarWhatsApp()">ENVIAR POR WHATSAPP</button></div>
+      <div class="botones"><button type="button" class="boton atras" onclick="nuevaReserva()">NUEVA RESERVA</button></div>
+      <p class="aviso">Tu cita queda pendiente hasta que NEXT LEVEL BARBER confirme la disponibilidad por WhatsApp.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <strong>NEXT LEVEL BARBER</strong><br>
+  Km 70 1/2 Costa del Sol, bulevar Los Tubos.<br>
+  Lunes a sábado · 8:00 AM - 4:00 PM<br>
+  WhatsApp: 7215-5267<br>
+  © 2026 NEXT LEVEL BARBER
+</footer>
+</div>
+
+<script>
+"use strict";
+
+// CONEXIÓN CON SUPABASE
+const SUPABASE_URL = "https://axnamshxiwagqvlehudf.supabase.co";
+const SUPABASE_KEY ="sb_publishable_jcPThwTD9V0OJmzS7NZmRg_6OOuy4v_";
+
+const NUMERO_WHATSAPP = "50372155267";
+
+async function consultarHorarios(fecha) {
+  const respuesta = await fetch(
+    `${SUPABASE_URL}/rest/v1/horarios_ocupados?select=fecha,hora&fecha=eq.${encodeURIComponent(fecha)}`,
+    {
+      headers: {
+        apikey: SUPABASE_KEY
+      }
+    }
+  );
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudieron consultar los horarios.");
+  }
+
+  return await respuesta.json();
+}
+
+async function guardarReserva(datos) {
+  const respuesta = await fetch(
+    `${SUPABASE_URL}/rest/v1/reservas`,
+    {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify(datos)
+    }
+  );
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudo guardar la reserva.");
+  }
+}
+
+const servicios = [
+  {nombre:"Corte clásico",precio:3},
+  {nombre:"Mullet con sheiver",precio:4},
+  {nombre:"Moicano con sheiver",precio:4},
+  {nombre:"Taper fade con sheiver",precio:4},
+  {nombre:"7 colombiano con sheiver",precio:4},
+  {nombre:"Mid fade con sheiver",precio:4},
+  {nombre:"Jay fade",precio:4}
+];
+
+let reserva = {
+  servicio:"",precio:0,barbero:"Equipo NEXT LEVEL",
+  fecha:"",hora:"",nombre:"",telefono:""
+};
+
+function fechaHoy() {
+  const hoy = new Date();
+  return new Date(hoy.getTime() - hoy.getTimezoneOffset()*60000)
+    .toISOString().split("T")[0];
+}
+
+const campoFecha = document.getElementById("fecha");
+campoFecha.min = fechaHoy();
+campoFecha.value = fechaHoy();
+reserva.fecha = fechaHoy();
+
+function mostrarServicios() {
+  const lista = document.getElementById("listaServicios");
+  lista.innerHTML = "";
+
+  servicios.forEach(servicio => {
+    const div = document.createElement("div");
+    div.className = "servicio";
+    div.innerHTML = `
+      <div><h3>${servicio.nombre}</h3><p>Servicio de barbería</p></div>
+      <strong>$${servicio.precio.toFixed(2)}</strong>
+      <input type="radio" name="servicio" aria-label="${servicio.nombre}">
+    `;
+
+    div.addEventListener("click", () => {
+      document.querySelectorAll(".servicio").forEach(e => {
+        e.classList.remove("seleccionado");
+        e.querySelector("input").checked = false;
+      });
+
+      div.classList.add("seleccionado");
+      div.querySelector("input").checked = true;
+      reserva.servicio = servicio.nombre;
+      reserva.precio = servicio.precio;
+      actualizarTotal();
+    });
+
+    lista.appendChild(div);
+  });
+}
+
+function actualizarTotal() {
+  let total = reserva.precio;
+
+  if (document.getElementById("pigmentacion").checked) total += 2;
+  if (document.getElementById("diseno").checked) total += 1;
+
+  document.getElementById("precioTotal").textContent = "$" + total.toFixed(2);
+  return total;
+}
+
+function mostrarPaso(numero) {
+  document.querySelectorAll(".pantalla").forEach(e => e.classList.remove("activa"));
+  document.getElementById("paso" + numero).classList.add("activa");
+
+  document.querySelectorAll(".paso").forEach((e,i) => {
+    e.classList.remove("activo","completo");
+    if (i+1 < numero) e.classList.add("completo");
+    if (i+1 === numero) e.classList.add("activo");
+  });
+
+  document.getElementById("barra").style.width = (numero*25) + "%";
+
+  if (numero === 4) {
+    document.getElementById("nombre").focus({preventScroll:true});
+  }
+}
+
+function siguiente(numero) {
+  if (numero === 1 && !reserva.servicio) {
+    alert("Selecciona un corte.");
+    return;
+  }
+
+  if (numero === 2) {
+    mostrarHorarios();
+  }
+
+  if (numero === 3) {
+    if (!reserva.fecha || !reserva.hora) {
+      alert("Selecciona fecha y hora.");
+      return;
+    }
+
+    document.getElementById("resumen").innerHTML = `
+      <strong>RESUMEN DE TU RESERVA</strong><br>
+      Servicio: ${reserva.servicio}<br>
+      ${document.getElementById("pigmentacion").checked ? "Pigmentación: $2.00<br>" : ""}
+      ${document.getElementById("diseno").checked ? "Diseño de cejas: $1.00<br>" : ""}
+      Barbero: ${reserva.barbero}<br>
+      Fecha: ${reserva.fecha}<br>
+      Hora: ${reserva.hora}<br>
+      <strong>TOTAL: $${actualizarTotal().toFixed(2)}</strong>
+    `;
+  }
+
+  mostrarPaso(numero+1);
+}
+
+function anterior(numero) {
+  mostrarPaso(numero-1);
+}
+
+function esDiaValido(fechaTexto) {
+  if (!fechaTexto) return false;
+
+  const [año,mes,dia] = fechaTexto.split("-").map(Number);
+  const diaSemana = new Date(año,mes-1,dia).getDay();
+
+  return diaSemana !== 0;
+}
+
+campoFecha.addEventListener("change", function() {
+  reserva.fecha = this.value;
+  reserva.hora = "";
+  mostrarHorarios();
+});
+
+async function mostrarHorarios() {
+  const contenedor = document.getElementById("horarios");
+  contenedor.innerHTML = "";
+  reserva.hora = "";
+
+  if (!reserva.fecha || !esDiaValido(reserva.fecha)) {
+    contenedor.innerHTML =
+      '<p style="grid-column:1/-1;color:#ffb3b3;font-size:12px">Selecciona un día de lunes a sábado.</p>';
+    return;
+  }
+
+  contenedor.innerHTML =
+    '<p style="grid-column:1/-1;color:#a9b8c9;font-size:12px">Consultando horarios...</p>';
+
+  const fechaConsultada = reserva.fecha;
+  let ocupados;
+
+  try {
+    ocupados = await consultarHorarios(fechaConsultada);
+  } catch (error) {
+    contenedor.innerHTML =
+      '<p style="grid-column:1/-1;color:#ffb3b3;font-size:12px">No se pudieron cargar los horarios. Intenta nuevamente.</p>';
+    return;
+  }
+
+  // Evita mostrar resultados de una fecha anterior
+  if (fechaConsultada !== reserva.fecha) return;
+
+  contenedor.innerHTML = "";
+
+  const horas = [];
+
+  for (let h=8; h<16; h++) {
+    horas.push(
+      String(h).padStart(2,"0")+":00",
+      String(h).padStart(2,"0")+":30"
+    );
+  }
+
+  horas.forEach(hora => {
+    const boton = document.createElement("button");
+    boton.type = "button";
+    boton.className = "horario";
+    boton.textContent = hora;
+
+    const ocupado = ocupados.some(
+      r => r.fecha === fechaConsultada && r.hora === hora
+    );
+
+    const [h,m] = hora.split(":").map(Number);
+    const minutosCita = h*60+m;
+    const ahora = new Date();
+    const minutosAhora = ahora.getHours()*60+ahora.getMinutes();
+
+    const pasado = fechaConsultada < fechaHoy() ||
+      (fechaConsultada === fechaHoy() && minutosCita <= minutosAhora);
+
+    if (ocupado || pasado) boton.disabled = true;
+
+    boton.addEventListener("click", () => {
+      document.querySelectorAll(".horario").forEach(e =>
+        e.classList.remove("seleccionado")
+      );
+
+      boton.classList.add("seleccionado");
+      reserva.hora = hora;
+    });
+
+    contenedor.appendChild(boton);
+  });
+}
+
+async function confirmar() {
+  const botonReservar = document.getElementById("btnReservar");
+
+  if (botonReservar.disabled) return;
+
+  reserva.nombre = document.getElementById("nombre").value.trim();
+  reserva.telefono = document.getElementById("telefono").value.trim();
+
+  if (!reserva.nombre) {
+    alert("Escribe tu nombre completo.");
+    document.getElementById("nombre").focus();
+    return;
+  }
+
+  if (!reserva.telefono) {
+    alert("Escribe tu número de teléfono.");
+    document.getElementById("telefono").focus();
+    return;
+  }
+
+  if (!/^[0-9+\s()-]{8,20}$/.test(reserva.telefono)) {
+    alert("Ingresa un teléfono válido.");
+    document.getElementById("telefono").focus();
+    return;
+  }
+
+  if (!reserva.servicio || !reserva.fecha || !reserva.hora) {
+    alert("Revisa el servicio, la fecha y la hora seleccionados.");
+    return;
+  }
+
+  if (reserva.fecha < fechaHoy() || !esDiaValido(reserva.fecha)) {
+    alert("Selecciona una fecha válida de lunes a sábado.");
+    mostrarPaso(3);
+    await mostrarHorarios();
+    return;
+  }
+
+  botonReservar.disabled = true;
+  botonReservar.textContent = "GUARDANDO...";
+
+  try {
+    // Comprobar nuevamente que el horario siga libre
+    const ocupados = await consultarHorarios(reserva.fecha);
+
+    const ocupado = ocupados.some(
+      r => r.fecha === reserva.fecha && r.hora === reserva.hora
+    );
+
+    if (ocupado) {
+      alert("Ese horario ya fue reservado. Selecciona otro.");
+      mostrarPaso(3);
+      await mostrarHorarios();
+      return;
+    }
+
+    const nueva = {
+      nombre: reserva.nombre,
+      telefono: reserva.telefono,
+      servicio: reserva.servicio,
+      pigmentacion: document.getElementById("pigmentacion").checked,
+      diseno_cejas: document.getElementById("diseno").checked,
+      barbero: reserva.barbero,
+      fecha: reserva.fecha,
+      hora: reserva.hora,
+      total: actualizarTotal(),
+      estado: "pendiente"
+    };
+
+    // Guardar en la base de datos compartida
+    await guardarReserva(nueva);
+
+    document.getElementById("detalleFinal").innerHTML = `
+      Hola ${reserva.nombre}.<br><br>
+      Tu solicitud quedó registrada.<br>
+      Servicio: ${reserva.servicio}<br>
+      Fecha: ${reserva.fecha}<br>
+      Hora: ${reserva.hora}<br>
+      Total: $${nueva.total.toFixed(2)}<br><br>
+      Envía los datos por WhatsApp para solicitar la confirmación.
+    `;
+
+    document.querySelectorAll(".pantalla").forEach(e =>
+      e.classList.remove("activa")
+    );
+
+    document.getElementById("final").classList.add("activa");
+    document.getElementById("barra").style.width = "100%";
+
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo guardar la reserva. Puede que ese horario ya esté ocupado o que exista un problema de conexión. Intenta nuevamente.");
+
+    mostrarPaso(3);
+    await mostrarHorarios();
+
+  } finally {
+    botonReservar.disabled = false;
+    botonReservar.textContent = "RESERVAR ✓";
+  }
+}
+
+function enviarWhatsApp() {
+  const pigmentacion = document.getElementById("pigmentacion").checked ? "Sí" : "No";
+  const diseno = document.getElementById("diseno").checked ? "Sí" : "No";
+  const total = actualizarTotal().toFixed(2);
+
+  const mensaje = [
+    "Hola NEXT LEVEL BARBER, quiero solicitar esta reserva:",
+    "",
+    "Nombre: " + reserva.nombre,
+    "Teléfono: " + reserva.telefono,
+    "Servicio: " + reserva.servicio,
+    "Pigmentación de cejas: " + pigmentacion,
+    "Diseño de cejas: " + diseno,
+    "Barbero: " + reserva.barbero,
+    "Fecha: " + reserva.fecha,
+    "Hora: " + reserva.hora,
+    "Total: $" + total,
+    "",
+    "Quedo pendiente de la confirmación de mi cita."
+  ].join("\n");
+
+  const enlace = "https://wa.me/" + NUMERO_WHATSAPP + "?text=" + encodeURIComponent(mensaje);
+  window.location.assign(enlace);
+}
+
+function nuevaReserva() {
+  reserva = {
+    servicio:"",precio:0,barbero:"Equipo NEXT LEVEL",
+    fecha:fechaHoy(),hora:"",nombre:"",telefono:""
+  };
+
+  document.getElementById("nombre").value = "";
+  document.getElementById("telefono").value = "";
+  document.getElementById("pigmentacion").checked = false;
+  document.getElementById("diseno").checked = false;
+
+  document.querySelectorAll(".servicio").forEach(e => {
+    e.classList.remove("seleccionado");
+    e.querySelector("input").checked = false;
+  });
+
+  campoFecha.value = fechaHoy();
+  actualizarTotal();
+  mostrarHorarios();
+  mostrarPaso(1);
+}
+
+mostrarServicios();
+mostrarHorarios();
+actualizarTotal();
+</script>
+</body>
+</html>
